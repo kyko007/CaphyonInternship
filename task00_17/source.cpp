@@ -5,11 +5,11 @@
 #include <regex>
 using namespace std;
 
-string restrictions = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_`!@#$%^&*()_+-=[]{};':,./<>?\|";
+string restrictions = " \f\n\r\t\v"; // all space chars recognized by iswspace()
 
 inline string ltrim(string s)
 {
-	size_t position = s.find_first_of(restrictions);
+	size_t position = s.find_first_not_of(restrictions);
 	if (position == string::npos)
 		return "";
 
@@ -18,7 +18,7 @@ inline string ltrim(string s)
 
 inline string rtrim(string s)
 {
-	size_t position = s.find_last_of(restrictions);
+	size_t position = s.find_last_not_of(restrictions);
 	if (position == string::npos)
 		return "";
 
