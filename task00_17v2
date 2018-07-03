@@ -1,0 +1,122 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <string>
+#include <regex>
+#include <string_view>
+using namespace std;
+
+string restrictions = " \f\n\r\t\v"; // all space chars recognized by iswspace()
+
+inline string_view ltrim(string_view sv)
+{
+	sv.remove_prefix(min(sv.find_first_not_of(restrictions), sv.size()));
+
+	return sv;
+}
+
+inline string_view rtrim(string_view sv)
+{
+	sv.remove_suffix( max( sv.size() - (sv.find_last_not_of(restrictions) + 1), (size_t)0));
+
+	return sv;
+}
+
+inline const string_view trim(string_view sv)
+{
+	return ltrim(rtrim(sv));
+}
+
+int correctness_test_ltrim() {
+	int failures = 0;
+	if (!("I love my instructor" == ltrim("I love my instructor"))) ++failures;
+	if (!("I love my instructor" == ltrim("   I love my instructor"))) ++failures;
+	if (!("I love my instructor  " == ltrim("I love my instructor  "))) ++failures;
+	if (!("I love my instructor  " == ltrim(" I love my instructor  "))) ++failures;
+	if (!("" == ltrim(""))) ++failures;
+	if (!("" == ltrim("  "))) ++failures;
+	return failures;
+}
+
+int correctness_test_rtrim() {
+	int failures = 0;
+	if (!("I love my instructor" == rtrim("I love my instructor"))) ++failures;
+	if (!("   I love my instructor" == rtrim("   I love my instructor"))) ++failures;
+	if (!("I love my instructor" == rtrim("I love my instructor  "))) ++failures;
+	if (!(" I love my instructor" == rtrim(" I love my instructor  "))) ++failures;
+	if (!("" == rtrim(""))) ++failures;
+	if (!("" == rtrim("  "))) ++failures;
+	return failures;
+}
+
+int correctness_test_trim() {
+	int failures = 0;
+	if (!("I love my instructor" == trim("I love my instructor"))) ++failures;
+	if (!("I love my instructor" == trim("   I love my instructor"))) ++failures;
+	if (!("I love my instructor" == trim("I love my instructor  "))) ++failures;
+	if (!("I love my instructor" == trim(" I love my instructor  "))) ++failures;
+	if (!("" == trim(""))) ++failures;
+	if (!("" == trim("  "))) ++failures;
+	return failures;
+}
+
+class M
+{
+	string s;
+public:
+
+	//M(const string & str) : s(str) {}
+	//M(string && str) : s(std::move(str)) {}
+
+	M(string str) : s(std::move(str)) {}
+
+	string safe() const
+	{
+		return s;
+	}
+
+	const string& fast() const
+	{
+		return s;
+	}
+
+	string_view alsoFast() const
+	{
+		return s;
+	}
+};
+
+const string& foo()
+{
+	string s;
+	M m(s);
+
+	return m.fast();
+}
+
+int main()
+{
+	string s;
+	M m(s);
+
+	auto p1 = m.safe();
+	auto p2 = m.fast();
+	auto p3 = m.alsoFast();
+
+	//string & p = m.fast();
+	const string & p;
+
+	string pp;
+	
+	{
+		M m(s);
+
+		pp = m.fast();
+	}
+
+	cout << correctness_test_ltrim() << '\n';
+	cout << correctness_test_rtrim() << '\n';
+	cout << correctness_test_trim() << '\n';
+	char ch;
+	cin >> ch;
+}
