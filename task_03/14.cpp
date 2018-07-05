@@ -9,14 +9,14 @@
 using namespace std;
 
 template <typename T, int N>
-typename std::enable_if< !(N<4 * 1024), vector<T> >::type
+std::enable_if_t< !(sizeof(T)*N<4 * 1024), vector<T> >
 	create_temp_buffer()
 {
 	return vector<T>(N);
 }
 
 template <typename T, int N>
-typename std::enable_if< N<4 * 1024, array<T, N> >::type
+std::enable_if_t< sizeof(T)*N<4 * 1024, array<T, N> >
 	create_temp_buffer()
 {
 	return array<T, N>{};
